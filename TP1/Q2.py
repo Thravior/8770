@@ -2,7 +2,6 @@ import numpy as np
 
 folders = [r"texte",r"image"]
 extension = {"image":"png","texte":"txt"}
-resultats = []
 
 def Compress(typef, num):
     b = bytearray()
@@ -83,5 +82,4 @@ def Compress(typef, num):
 
 for folder in folders:
     for i in range(1,6):
-        resultats.append((folder+"_"+str(i)+"."+extension[folder], Compress(folder,i)))
-print(resultats)
+        print((folder+"_"+str(i)+"."+extension[folder], Compress(folder,i)))
