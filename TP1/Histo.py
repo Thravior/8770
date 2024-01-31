@@ -9,7 +9,6 @@ extension = {"image":"png","texte":"txt"}
 def Histo(typef, num):
     b = bytearray()
     file_path =   typef+"s/"+typef+"_"+str(num)+"."+extension[typef]
-    im = None
     with open(file_path, 'rb') as file:
         f = file.read()
         b = bytearray(f)
@@ -18,6 +17,7 @@ def Histo(typef, num):
     x=len(Message)
     y = 1
     diff = 1 
+
     if b[0:9].hex() == '89504e470d0a1a0a00': # est png
         x = int(b[16:20].hex(),16)
         print(int(b[20:24].hex(),16))
@@ -28,7 +28,8 @@ def Histo(typef, num):
             diff = 4
         elif b[25] == 4:
             diff = 2
-    # initialisation:
+
+
 
     l=[]
     for i in range(len(Message)):
@@ -37,19 +38,7 @@ def Histo(typef, num):
         else:
             l.append((Message[i]^Message[i-diff]))
 
-
-    dictionnaire = {}
-    for i in range(3,len(Message)):
-        v = l[i] 
-        if hex(v) not in dictionnaire:
-            dictionnaire[hex(v)] = 1
-        else:
-            dictionnaire[hex(v)] += 1
-
-    liste = [i for i in dictionnaire.items()]
-
-    liste2 = [int(item[0],16) for item in liste for i in range(item[1]) ]
-    return (liste2,len(liste))
+    return (l,257)
 
 
 for folder in folders:

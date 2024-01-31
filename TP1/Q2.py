@@ -1,11 +1,14 @@
 import numpy as np
+import time
 
 folders = [r"texte",r"image"]
 extension = {"image":"png","texte":"txt"}
 
 def Compress(typef, num):
+    start_time = time.time()
+
     b = bytearray()
-    file_path =   "TP1\\"+ typef+"s/"+typef+"_"+str(num)+"."+extension[typef]
+    file_path =   typef+"s/"+typef+"_"+str(num)+"."+extension[typef]
     with open(file_path, 'rb') as file:
         f = file.read()
         b = bytearray(f)
@@ -29,9 +32,6 @@ def Compress(typef, num):
     # ajustements initiaux
     for i in range(nbsymboles):
         dictbin[i] = "{:b}".format(i).zfill(int(np.ceil(np.log2(nbsymboles))))
-
-    #dictsymb.sort()
-#    dictionnaire = np.transpose([dictsymb,dictbin])
 
     # Codage:
     i=0
@@ -66,20 +66,11 @@ def Compress(typef, num):
             for j in range(nbsymboles):
                 dictbin[j] = "{:b}".format(j).zfill(int(np.ceil(np.log2(nbsymboles))))
 
-    ## Tests
-#    print(MessageCode)
 
-    #Affichage du dictionnaire final
-
-
-    #print(a)
-    #dictionnaire = np.transpose([dictsymb,dictbin])
-
-    #print("Longueur = {0}".format(longueur))
-    #print("Longueur originale = {0}".format(longueurOriginale))
-    return 1-longueur/longueurOriginale 
+    return (1-longueur/longueurOriginale, time.time()-start_time)
 
 
 for folder in folders:
     for i in range(1,6):
-        print((folder+"_"+str(i)+"."+extension[folder], Compress(folder,i)))
+        ratio, duree = Compress(folder,i)
+        print((folder+"_"+str(i)+"."+extension[folder]+ ": \n\tRatio: " + "{:.5f}".format(ratio) + "\n\tTemps de compression: " + "{:.5f}".format(duree) ))

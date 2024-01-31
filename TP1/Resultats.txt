@@ -1,0 +1,30 @@
+Compression avec algorithme inital:
+    texte_1.txt: 
+            Ratio: 0.11905
+            Temps de compression: 0.00100
+    texte_2.txt:
+            Ratio: 0.26623
+    texte_3.txt:
+            Ratio: 0.10784
+            Temps de compression: 0.00100
+    texte_4.txt:
+            Ratio: 0.00110
+            Temps de compression: 0.00200
+    texte_5.txt:
+            Ratio: 0.26607
+            Temps de compression: 0.01152
+    image_1.png:
+            Ratio: -0.26935
+            Temps de compression: 101.49536
+    image_2.png:
+            Ratio: 0.57120
+            Temps de compression: 0.00100
+    image_3.png:
+            Ratio: -0.25508
+            Temps de compression: 202.19862
+    image_4.png:
+            Ratio: -0.21358
+            Temps de compression: 562.69184
+    image_5.png:
+            Ratio: -0.15496
+            Temps de compression: 0.15110
