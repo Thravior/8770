@@ -14,14 +14,8 @@ def Histo(typef, num):
         b = bytearray(f)
     Message = b
     
-    x=len(Message)
-    y = 1
-    diff = 1 
-
+    diff = 0 
     if b[0:9].hex() == '89504e470d0a1a0a00': # est png
-        x = int(b[16:20].hex(),16)
-        print(int(b[20:24].hex(),16))
-
         if b[25] == 2:
             diff = 3
         elif b[25] == 6:
@@ -29,16 +23,16 @@ def Histo(typef, num):
         elif b[25] == 4:
             diff = 2
 
-
-
     l=[]
     for i in range(len(Message)):
+        if diff == 0:
+            break
         if i<diff:
             l.append(Message[i])
         else:
             l.append((Message[i]^Message[i-diff]))
 
-    return (l,257)
+    return ([hex(w) for w in Message] if len(l) == 0 else l,257)
 
 
 for folder in folders:
