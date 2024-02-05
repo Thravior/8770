@@ -6,7 +6,29 @@ from anytree import Node, RenderTree, PreOrderIter, AsciiStyle
 folders = [r"texte",r"image"]
 extension = {"image":"png","texte":"txt"}
 
-def Compress(typef, num):
+
+def transform(source:bytearray):
+    diff = 0 
+    if source[0:9].hex() == '89504e470d0a1a0a00': # est png
+        if source[25] == 2:
+            diff = 3
+        elif source[25] == 6:
+            diff = 4
+        elif source[25] == 4:
+            diff = 2
+
+    l=[]
+    for i in range(len(source)):
+        if diff == 0:
+            break
+        if i<diff:
+            l.append(source[i])
+        else:
+            l.append((source[i]^source[i-diff]))
+
+    return l if len(l)>0 else source
+
+def CompressHuffman(typef, num):
     start_time = time.time()
 
     b = bytearray()
@@ -16,27 +38,8 @@ def Compress(typef, num):
         b = bytearray(f)
 
     #Message à coder
-    Message = b
-    diff = 1 
-    if b[0:9].hex() == '89504e470d0a1a0a00': # est png
-        if b[25] == 2:
-            diff = 3
-        elif b[25] == 6:
-            diff = 4
-        elif b[25] == 4:
-            diff = 2
+    Message = transform(b)
 
-    l=[]
-    for i in range(len(Message)):
-        if diff == 0:
-            break
-        if i<diff:
-            l.append(Message[i])
-        else:
-            l.append((Message[i]^Message[i-diff]))
-
-    if len(l)>0:
-        Message = l 
     #Préparation pour la création de l'arbre. On trouve les feuilles (symboles) et leurs poids (nb occurences).
 
     #Liste qui sera modifié jusqu'à ce qu'elle contienne seulement la racine de l'arbre
@@ -119,16 +122,9 @@ def Compress(typef, num):
         substitution = list(filter(lambda x: x[0] == hex(Message[i]), dictionnaire))
         MessageCode += [substitution[0][1]]
         longueur += len(substitution[0][1])
-
-#    print('Espérance: ' + str(longueur/len(Message)))
-    entropie =0
-    for i in range(nbsymboles):
-        entropie = entropie-(OccSymb[i][1]/len(Message))*math.log(OccSymb[i][1]/len(Message),2)
-
-#    print('Entropie: ' + str(entropie))
     return (1-longueur/longueurOriginale, time.time()-start_time)
 
 for folder in folders:
     for i in range(1,6):
-        ratio, duree = Compress(folder,i)
+        ratio, duree = CompressHuffman(folder,i)
         print((folder+"_"+str(i)+"."+extension[folder]+ ": \n\tRatio: " + "{:.5f}".format(ratio) + "\n\tTemps de compression: " + "{:.5f}".format(duree) ))
