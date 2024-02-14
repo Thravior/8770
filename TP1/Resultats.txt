@@ -4,6 +4,7 @@ Compression avec algorithme inital:
             Temps de compression: 0.00100
     texte_2.txt:
             Ratio: 0.26623
+            Temps de compression: 0.00100
     texte_3.txt:
             Ratio: 0.10784
             Temps de compression: 0.00100
@@ -61,34 +62,3 @@ image_5.png:
         Ratio: 0.02436
         Temps de compression: 0.40968
 
-Huffman XOR adaptif distance min 1:
-    texte_1.txt: 
-            Ratio: 0.43452
-            Temps de compression: 0.00100
-    texte_2.txt:
-            Ratio: 0.51082
-            Temps de compression: 0.00100
-    texte_3.txt:
-            Ratio: 0.10294
-            Temps de compression: 0.00100
-    texte_4.txt:
-            Ratio: 0.09707
-            Temps de compression: 0.00600
-    texte_5.txt: 
-            Ratio: 0.18433
-            Temps de compression: 0.04100
-    image_1.png: 
-            Ratio: 0.02944
-            Temps de compression: 13.74274
-    image_2.png:
-            Ratio: 0.54612
-            Temps de compression: 0.00600
-    image_3.png: 
-            Ratio: 0.00000
-            Temps de compression: 19.75447
-    image_4.png: 
-            Ratio: 0.00000
-            Temps de compression: 35.36997
-    image_5.png: 
-            Ratio: 0.01068
-            Temps de compression: 0.40674
