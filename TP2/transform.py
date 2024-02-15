@@ -33,11 +33,6 @@ def FromYUV(data:np.array ):
          b[i][j][2] = b[i][j][1] + data[i][j][2]
     return b
 
-def Quantify(data:np.array):
-    for i in range(data.shape[0]):
-        for j in range(data.shape[1]):
-            a=1
-
 
 
 def KL(data:np.array):
@@ -76,11 +71,31 @@ def KL(data:np.array):
     return (imageKL, eigvec, Moy)
 
 
-for i in range(1,6):
-  with Image.open(r"TP2\\data\\kodim0"+str(i) +".png") as im:
-    red = list(im.getdata(0))
-    green = list(im.getdata(1))
-    blue = list(im.getdata(2))
-    array = np.asarray(im)    
-    imageKL, vecteur, Moyeenne = KL(array)
-    
+"""
+suppose entrée et sortie sur 8 bits, entree devient sur values bits
+"""
+def Quantify(data:np.array, values:tuple[int,int,int]):
+    values = [8-i for i in values]
+    for i in range(data.shape[0]):
+        for j in range(data.shape[1]):
+            data[i][j][0] = data[i][j][0] >> values[0]  
+            data[i][j][0] = data[i][j][0] >> values[1]
+            data[i][j][0] = data[i][j][0] >> values[2]
+
+"""
+suppose entrée et sortie sur 8 bits, entree devient 
+"""
+def Unquantify(data:np.array, values:tuple[int,int,int]):
+    values = [8-i for i in values]
+    for i in range(data.shape[0]):
+        for j in range(data.shape[1]):
+            data[i][j][0] = data[i][j][0] << values[0]  
+            data[i][j][0] = data[i][j][0] << values[1]
+            data[i][j][0] = data[i][j][0] << values[2]
+
+with Image.open(r"TP2\\data\\kodim0"+str(i) +".png") as im:
+  red = list(im.getdata(0))
+  green = list(im.getdata(1))
+  blue = list(im.getdata(2))
+  array = np.asarray(im)    
+  imageKL, vecteur, Moyeenne = KL(array)
