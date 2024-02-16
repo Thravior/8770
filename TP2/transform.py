@@ -10,7 +10,7 @@ from numpy import linalg as LA
   V = R − G 
 """
 def ToYUV(data:np.array ):
-    b = np.empty_like(data,dtype= int)
+    b = np.copy(data)
     for i in range(data.shape[0]):
        for j in range(data.shape[1]):
          b[i][j][0] = (int(data[i][j][0]) + 2*int(data[i][j][1]) + int(data[i][j][2]))/4          
@@ -20,17 +20,17 @@ def ToYUV(data:np.array ):
 
 """
   R = V + G
-  G = Y- (U+V)/4
+  G = Y - (U+V)/4
   B = U + G 
 """
 def FromYUV(data:np.array ):
-    b = np.empty_like(data)
+    b = np.copy(data)
     for i in range(data.shape[0]):
        for j in range(data.shape[1]):
          b[i][j][1] = data[i][j][0] - (data[i][j][1] + data[i][j][2])/4
 
-         b[i][j][0] = b[i][j][1] + data[i][j][1]
-         b[i][j][2] = b[i][j][1] + data[i][j][2]
+         b[i][j][2] = b[i][j][1] + data[i][j][1]
+         b[i][j][0] = b[i][j][1] + data[i][j][2]
     return b
 
 
@@ -93,22 +93,24 @@ suppose entrée sur 8 bits et sorties sur values bits
 """
 def Quantify(data:np.array, values:tuple[int,int,int]):
     values = [8-i for i in values]
+    dataNew = data.astype('uint8')
     for i in range(data.shape[0]):
         for j in range(data.shape[1]):
-            data[i][j][0] = data[i][j][0] >> values[0]  
-            data[i][j][1] = data[i][j][1] >> values[1]
-            data[i][j][2] = data[i][j][2] >> values[2]
+            data[i][j][0] = dataNew[i][j][0] >> int(values[0])
+            data[i][j][1] = dataNew[i][j][1] >> int(values[1])
+            data[i][j][2] = dataNew[i][j][2] >> int(values[2])
 
 """
 suppose entrées sur values bit et sortie sur 8 bits 
 """
 def Unquantify(data:np.array, values:tuple[int,int,int]):
     values = [8-i for i in values]
+    dataNew = data.astype('uint8')
     for i in range(data.shape[0]):
         for j in range(data.shape[1]):
-            data[i][j][0] = data[i][j][0] << values[0]  
-            data[i][j][1] = data[i][j][1] << values[1]
-            data[i][j][2] = data[i][j][2] << values[2]
+            data[i][j][0] = dataNew[i][j][0] << int(values[0])
+            data[i][j][1] = dataNew[i][j][1] << int(values[1])
+            data[i][j][2] = dataNew[i][j][2] << int(values[2])
 
 with Image.open(r"TP2\\data\\kodim01.png") as im:
   """  array = np.asarray(im) 
@@ -120,10 +122,13 @@ with Image.open(r"TP2\\data\\kodim01.png") as im:
   print(original[2][4])
   """
   
-  import matplotlib.pyplot as py
+  import matplotlib.pyplot as py  
   fig1 = py.figure(figsize = (10,10))
-  imagelue = py.imread(r"TP2\\data\\kodim01.png")
-  image=imagelue.astype('double')
+  imagelue = np.asarray(im)
+#  py.imread(r"TP2\\data\\kodim01.png")
+
+  imageC=imagelue.astype('double')
+  image = ToYUV(imageC)
 
   Moyenne = np.array([0.0,0.0,0.0])
 
@@ -161,6 +166,12 @@ with Image.open(r"TP2\\data\\kodim01.png") as im:
           #a=Mb
           imageKL[i][j][:] = np.reshape(np.dot(eigvec,np.subtract(vecTemp,vecMoy)),(3))
 
+#  Quantify(imageKL,(8,8,8))
+
+#  Unquantify(imageKL,(8,8,8))
+
+
+  # Inverse
   invEigvec = LA.pinv(eigvec)
 
   vecMoy =[Moyenne[0], Moyenne[1], Moyenne[2]] 
@@ -171,4 +182,12 @@ with Image.open(r"TP2\\data\\kodim01.png") as im:
         #b=inv(M)a
             vecTemp=[[imageKL[i][j][0]], [imageKL[i][j][1]], [imageKL[i][j][2]]]
             imageRGB[i][j][:] = np.add(np.reshape(np.dot(invEigvec,vecTemp),(3)),vecMoy)
-            print(str(image[i][j]) + " "+ str(imageRGB[i][j]) )
+#            print(str(image[i][j]) + " "+ str(imageRGB[i][j]) )
+  imageD = FromYUV(imageRGB)
+  imageD = FromYUV(image)
+
+  fig2 = py.figure(figsize = (10,10))
+  imageout = np.clip(imageD,0,255)
+  imageout= imageout.astype('uint8')
+  py.imshow(imageout)
+  py.show()
