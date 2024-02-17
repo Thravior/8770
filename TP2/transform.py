@@ -3,6 +3,13 @@ import cv2
 import numpy as np
 from numpy import linalg as LA
 
+# https://gist.github.com/nimpy/5b0085075a54ba2e94f2cfabf5a98a57
+def calculate_psnr(img1, img2, max_value=255):
+    """"Calculating peak signal-to-noise ratio (PSNR) between two images."""
+    mse = np.mean((np.array(img1, dtype=np.float32) - np.array(img2, dtype=np.float32)) ** 2)
+    if mse == 0:
+        return 100
+    return 20 * np.log10(max_value / (np.sqrt(mse)))
 
 """
   Y = (R + 2G + B) /4
@@ -140,6 +147,8 @@ with Image.open(r"TP2\\data\\kodim01.png") as im:
   results = []
   for Values in Quantifications:
       results.append(FromYUV(KLInverse(Values[1],eigvec,Moyenne)))
+
+
   for result in results:      
     fig2 = py.figure(figsize = (10,10))
     imageout = np.clip(result,0,255)
