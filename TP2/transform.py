@@ -130,20 +130,19 @@ with Image.open(r"TP2\\data\\kodim01.png") as im:
   image = ToYUV(imageC)
 
   imageKL, eigvec, Moyenne = KL(image)
-  
-  """
+
   Quantifications = [((8,8,8),np.copy(imageKL)),((8,8,4),np.copy(imageKL)),((8,8,0),np.copy(imageKL)),((8,6,2),np.copy(imageKL))]
   for Values in Quantifications:
       Quantify(Values[1],Values[0])
       Unquantify(Values[1],Values[0])
-  """
-  imageRGB = KLInverse(imageKL,eigvec,Moyenne)
-#            print(str(image[i][j]) + " "+ str(imageRGB[i][j]) )
-  imageD = FromYUV(imageRGB)
-  imageD = FromYUV(image)
+      KLInverse
 
-  fig2 = py.figure(figsize = (10,10))
-  imageout = np.clip(imageD,0,255)
-  imageout= imageout.astype('uint8')
-  py.imshow(imageout)
-  py.show()
+  results = []
+  for Values in Quantifications:
+      results.append(FromYUV(KLInverse(Values[1],eigvec,Moyenne)))
+  for result in results:      
+    fig2 = py.figure(figsize = (10,10))
+    imageout = np.clip(result,0,255)
+    imageout= imageout.astype('uint8')
+    py.imshow(imageout)
+    py.show()
