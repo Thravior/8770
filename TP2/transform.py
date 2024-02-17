@@ -3,6 +3,9 @@ import cv2
 import numpy as np
 from numpy import linalg as LA
 
+from skimage.metrics import structural_similarity as ssim
+from skimage.metrics import peak_signal_noise_ratio as psnr
+
 # https://gist.github.com/nimpy/5b0085075a54ba2e94f2cfabf5a98a57
 def calculate_psnr(img1, img2, max_value=255):
     """"Calculating peak signal-to-noise ratio (PSNR) between two images."""
@@ -17,13 +20,13 @@ def calculate_psnr(img1, img2, max_value=255):
   V = R − G 
 """
 def ToYUV(data:np.array ):
-    b = np.copy(data)
+    b = np.copy(data).astype('double')
     for i in range(data.shape[0]):
        for j in range(data.shape[1]):
          b[i][j][0] = (int(data[i][j][0]) + 2*int(data[i][j][1]) + int(data[i][j][2]))/4          
          b[i][j][1] = int(data[i][j][2]) - int(data[i][j][1])
          b[i][j][2] = int(data[i][j][0]) - int(data[i][j][1])
-    return b
+    return b.astype("double")
 
 """
   R = V + G
@@ -31,14 +34,14 @@ def ToYUV(data:np.array ):
   B = U + G 
 """
 def FromYUV(data:np.array ):
-    b = np.copy(data)
+    b = np.copy(data).astype('double')
     for i in range(data.shape[0]):
        for j in range(data.shape[1]):
          b[i][j][1] = data[i][j][0] - (data[i][j][1] + data[i][j][2])/4
 
          b[i][j][2] = b[i][j][1] + data[i][j][1]
          b[i][j][0] = b[i][j][1] + data[i][j][2]
-    return b
+    return b.astype('uint8')
 
 
 
@@ -69,7 +72,7 @@ def KL(image:np.array):
   eigval, eigvec = LA.eig(covRGB)
 
   eigvec = np.transpose(eigvec)
-  imageKL = np.copy(image)  
+  imageKL = np.copy(image).astype('double')
 
   vecMoy =[[Moyenne[0]], [Moyenne[1]], [Moyenne[2]]] 
 
@@ -98,60 +101,43 @@ def KLInverse(image:np.array, eigvec:np.array, Moyenne:np.array):
 suppose entrée sur 8 bits et sorties sur values bits
 """
 def Quantify(data:np.array, values:tuple[int,int,int]):
-    values = [8-i for i in values]
-    dataNew = data.astype('uint8')
+    values_usable = [8-i for i in values]
+    dataNew = np.copy(data).astype("int8")
     for i in range(data.shape[0]):
         for j in range(data.shape[1]):
-            data[i][j][0] = dataNew[i][j][0] >> int(values[0])
-            data[i][j][1] = dataNew[i][j][1] >> int(values[1])
-            data[i][j][2] = dataNew[i][j][2] >> int(values[2])
+            for channel in range(data.shape[2]):                
+              dataNew[i][j][channel] = ( dataNew[i][j][channel] >> values_usable[channel] ) << values_usable[channel]
+    print("Quantification:")
+    return dataNew 
 
-"""
-suppose entrées sur values bit et sortie sur 8 bits 
-"""
-def Unquantify(data:np.array, values:tuple[int,int,int]):
-    values = [8-i for i in values]
-    dataNew = data.astype('uint8')
-    for i in range(data.shape[0]):
-        for j in range(data.shape[1]):
-            data[i][j][0] = dataNew[i][j][0] << int(values[0])
-            data[i][j][1] = dataNew[i][j][1] << int(values[1])
-            data[i][j][2] = dataNew[i][j][2] << int(values[2])
+liste_images = [r"TP2\\data\\kodim01.png",r"TP2\\data\\kodim02.png",r"TP2\\data\\kodim05.png",r"TP2\\data\\kodim13.png",r"TP2\\data\\kodim23.png"]
+for Pathimage in liste_images:
+  print(Pathimage)
+  with Image.open(Pathimage) as im:
+    """  array = np.asarray(im) 
+    imageYUV = ToYUV(array)
+    imageKL, vecteur, Moyenne = KL(imageYUV)
+    original = KLInverse(imageKL,vecteur,Moyenne)
+    print(imageYUV[2][4])
+    print(imageKL[2][4])
+    print(original[2][4])
+    """
+    
+    import matplotlib.pyplot as py  
+    fig1 = py.figure(figsize = (10,10))
+    imagelue = np.asarray(im)
 
-with Image.open(r"TP2\\data\\kodim01.png") as im:
-  """  array = np.asarray(im) 
-  imageYUV = ToYUV(array)
-  imageKL, vecteur, Moyenne = KL(imageYUV)
-  original = KLInverse(imageKL,vecteur,Moyenne)
-  print(imageYUV[2][4])
-  print(imageKL[2][4])
-  print(original[2][4])
-  """
-  
-  import matplotlib.pyplot as py  
-  fig1 = py.figure(figsize = (10,10))
-  imagelue = np.asarray(im)
-#  py.imread(r"TP2\\data\\kodim01.png")
+    imageC=imagelue.astype('double')
+    image = ToYUV(imageC)
 
-  imageC=imagelue.astype('double')
-  image = ToYUV(imageC)
+    imageKL, eigvec, Moyenne = KL(image)
 
-  imageKL, eigvec, Moyenne = KL(image)
+    Quantifications = [(8,8,8),(8,8,4) ,(8,8,0),(8,6,2)]
+    for Values in Quantifications:
+        print("Compression:\t", Values)
+        quantified = Quantify(imageKL,Values)
 
-  Quantifications = [((8,8,8),np.copy(imageKL)),((8,8,4),np.copy(imageKL)),((8,8,0),np.copy(imageKL)),((8,6,2),np.copy(imageKL))]
-  for Values in Quantifications:
-      Quantify(Values[1],Values[0])
-      Unquantify(Values[1],Values[0])
-      KLInverse
+        inverse = KLInverse(quantified,eigvec,Moyenne)
+        rgb = FromYUV(inverse)
 
-  results = []
-  for Values in Quantifications:
-      results.append(FromYUV(KLInverse(Values[1],eigvec,Moyenne)))
-
-
-  for result in results:      
-    fig2 = py.figure(figsize = (10,10))
-    imageout = np.clip(result,0,255)
-    imageout= imageout.astype('uint8')
-    py.imshow(imageout)
-    py.show()
+    break
