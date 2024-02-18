@@ -90,16 +90,17 @@ def KLInverse(image:np.array, eigvec:np.array, Moyenne:np.array):
             imageTR[i][j][:] = np.add(np.reshape(np.dot(invEigvec,vecTemp),(3)),vecMoy)
   return imageTR.astype("int8")
 
-"""
-suppose entrée sur 8 bits et sorties sur values bits
-"""
 def Quantify(data:np.array, values:tuple[int,int,int]):
-    values_usable = [8-i for i in values]
-    dataNew = np.copy(data).astype("int16")
+    dataNew = np.copy(data).astype("double")
+    minimun = data.min()
+    maximum = data.max()
+    intervale = maximum - minimun
+    values_usable = [intervale/(2**i) for i in values]
+
     for i in range(data.shape[0]):
         for j in range(data.shape[1]):
-            for channel in range(data.shape[2]):                
-              dataNew[i][j][channel] = ( dataNew[i][j][channel] >> values_usable[channel] ) << values_usable[channel]
+            for channel in range(data.shape[2]):                  
+                dataNew[i][j][channel] = int((dataNew[i][j][channel]-minimun) / values_usable[channel]) * values_usable[channel] + minimun
     return dataNew 
 
 liste_images = [r"kodim01.png",r"kodim02.png",r"kodim05.png",r"kodim13.png",r"kodim23.png"]
@@ -127,7 +128,7 @@ for Pathimage in liste_images:
         quantifiedRGB = Quantify(cRGB,Values)
 
         inverseYUV = KLInverse(quantifiedYUV,eigvecYUV,MoyenneYUV)
-        inverseRGB = KLInverse(quantifiedRGB,eigvecYUV,MoyenneYUV)
+        inverseRGB = KLInverse(quantifiedRGB,eigvecRGB,MoyenneRGB)
 
         rgbYUV = FromYUV(inverseYUV)
         rgbRGB = FromYUV(inverseRGB)
