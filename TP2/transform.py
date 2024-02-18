@@ -118,7 +118,7 @@ for Pathimage in liste_images:
     imageKLYUV, eigvecYUV, MoyenneYUV = KL(imageYUV)
     imageKLRGB, eigvecRGB, MoyenneRGB = KL(imageRGB)
 
-    Quantifications = [(8,8,8),(8,8,4),(8,8,0),(5,5,5)]
+    Quantifications = [(6,5,5)]
 
     for Values in Quantifications:
         cYUV = copy.deepcopy(imageKLYUV)

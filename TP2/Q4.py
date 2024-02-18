@@ -109,12 +109,12 @@ def Quantify(data:np.array, values:tuple[int,int,int]):
     minimun = data.min()
     maximum = data.max()
     intervale = maximum - minimun
-    intervaleQuantifie = intervale/64
+    values_usable = [intervale/(2**i) for i in values]
 
     for i in range(data.shape[0]):
         for j in range(data.shape[1]):
-            for channel in range(data.shape[2]):
-                dataNew[i][j][channel] = int((dataNew[i][j][channel]-minimun) / intervaleQuantifie) * intervaleQuantifie + minimun
+            for channel in range(data.shape[2]):                  
+                dataNew[i][j][channel] = int((dataNew[i][j][channel]-minimun) / values_usable[channel]) * values_usable[channel] + minimun
     return dataNew 
 
 import matplotlib.pyplot as py
@@ -138,7 +138,7 @@ for Pathimage in liste_images:
                 Originale = copy.deepcopy(image2)
                 image2 = ToYUV(image2)
                 image2KL = KLpartiel(image2,vecteur1,Moyenne1)
-                imageComposite = Quantify(image2KL, (5,5,5))
+                imageComposite = Quantify(image2KL, (6,5,5))
 
                 imageCompositeYUV = KLInverse(imageComposite,vecteur1,Moyenne1)
 
