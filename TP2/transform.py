@@ -102,38 +102,38 @@ def Quantify(data:np.array, values:tuple[int,int,int]):
               dataNew[i][j][channel] = ( dataNew[i][j][channel] >> values_usable[channel] ) << values_usable[channel]
     return dataNew 
 
-liste_images = [r"TP2\\data\\kodim01.png",r"TP2\\data\\kodim02.png",r"TP2\\data\\kodim05.png",r"TP2\\data\\kodim13.png",r"TP2\\data\\kodim23.png"]
+liste_images = [r"kodim01.png",r"kodim02.png",r"kodim05.png",r"kodim13.png",r"kodim23.png"]
 for Pathimage in liste_images:
   print(Pathimage)
-  with Image.open(Pathimage) as im:
-    """  array = np.asarray(im) 
-    imageYUV = ToYUV(array)
-    imageKL, vecteur, Moyenne = KL(imageYUV)
-    original = KLInverse(imageKL,vecteur,Moyenne)
-    print(imageYUV[2][4])
-    print(imageKL[2][4])
-    print(original[2][4])
-    """
-    
-    import matplotlib.pyplot as py  
+  with Image.open(r"TP2\\data\\"+ Pathimage) as im:    
     imagelue = np.asarray(im)
     Original = copy.deepcopy(imagelue)
 
     imageC=imagelue.astype('double')
-    image = ToYUV(imageC)
 
-    imageKL, eigvec, Moyenne = KL(image)
+    imageRGB = copy.deepcopy(imagelue)
+    imageYUV = ToYUV(imageC)
 
-    Quantifications = [(8,8,8),(8,8,4),(8,8,0),(8,6,2)]
+    imageKLYUV, eigvecYUV, MoyenneYUV = KL(imageYUV)
+    imageKLRGB, eigvecRGB, MoyenneRGB = KL(imageRGB)
+
+    Quantifications = [(8,8,8),(8,8,4),(8,8,0),(5,5,5)]
 
     for Values in Quantifications:
-        c = copy.deepcopy(imageKL)
+        cYUV = copy.deepcopy(imageKLYUV)
+        cRGB = copy.deepcopy(imageKLRGB)
         print("Compression:\t", Values)
-        quantified = Quantify(c,Values)
+        quantifiedYUV = Quantify(cYUV,Values)
+        quantifiedRGB = Quantify(cRGB,Values)
 
-        inverse = KLInverse(quantified,eigvec,Moyenne)
+        inverseYUV = KLInverse(quantifiedYUV,eigvecYUV,MoyenneYUV)
+        inverseRGB = KLInverse(quantifiedRGB,eigvecYUV,MoyenneYUV)
 
-        rgb = FromYUV(inverse)
-        print("\tPSNR:\t", psnr(imagelue,rgb))
-        print("\tSSIM:\t",ssim(imagelue,rgb,channel_axis=2))
-        
+        rgbYUV = FromYUV(inverseYUV)
+        rgbRGB = FromYUV(inverseRGB)
+        print("YUV:")
+        print("\tPSNR:\t", psnr(imagelue,rgbYUV))
+        print("\tSSIM:\t",ssim(imagelue,rgbYUV,channel_axis=2))
+        print("RGB:")
+        print("\tPSNR:\t", psnr(imagelue,rgbRGB))
+        print("\tSSIM:\t",ssim(imagelue,rgbRGB,channel_axis=2))
