@@ -1,0 +1,15 @@
+1.
+	a) assumant que l'on cherche l'image, si elle vient d'une vidéo, est la trame exacte, 100% ou 0% selon que l'on prend en compte les pertes et donc changements du au passage à un format d'image avec une compression avec perte
+
+	b) 423MO (4 * 10^8 O)
+
+	c) L*H (image) * f(image/s) * d(durée en s) * c(information en octet par pixel) * n(nbr image)
+	en log base 10: L*H= 5.96(720X1280) f= 1.45(en moyenne en peu moins de 30 images/s)  c= 0.48(3 canaux pour couleur) d= 1.18(moyenne env. 15s) n= 2 (100 images) => environ 10^11 
+
+	d) tx compression jpeg ????
+
+	e) compression ...
+
+
+
+2.
