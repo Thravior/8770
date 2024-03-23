@@ -23,7 +23,7 @@
 			- YUV	(X) (plus de calculs --int)
 		- Dimension:
 			- 1D	(256/intervals * 3 de longueur)		
-			- 3D	(256/intervals ^ 3)			reduire nombre de couleur aussi?
+			- 3D	(256/intervals ^ 3)			
 		- Intervalles
 			- 1	trop de calculs
 			- 2	assez?
