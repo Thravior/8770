@@ -23,7 +23,7 @@
 			- YUV	(X) (plus de calculs --int)
 		- Dimension:
 			- 1D	(256/intervals * 3 de longueur)		
-			- 3D	(256/intervals ^ 3)			reduire nombre de coueleur aussi?
+			- 3D	(256/intervals ^ 3)			reduire nombre de couleur aussi?
 		- Intervalles
 			- 1	trop de calculs
 			- 2	assez?
@@ -36,7 +36,7 @@
 		- Distance de Bhattacharyya	-ln(SOMME(sqrt(p*q)))
 		- Produit scalaire
 		- Similarité cosinus 		(produit scalaire / norme) (strictement plus de calculs, mais max donne résultat)
-				cos() = X * Y / (||X|| x ||Y||) => ||X||cos() = X * Y / ||Y|| serais équivalent pour comparaison , on divise par ||X|| selement ppour le seuil
+				cos() = X * Y / (||X|| x ||Y||) => ||X||cos() = X * Y / ||Y|| serais équivalent pour comparaison , on divise par ||X|| selement pour le seuil
 
 
 Algo:
