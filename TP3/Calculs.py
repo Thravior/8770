@@ -1,4 +1,5 @@
 import numpy as np
+import math
 from numpy.linalg import norm
 from Katna.video import Video
 import Katna.writer as kw
@@ -37,7 +38,14 @@ class DataWriter(kw.Writer):
   
 if __name__ == '__main__':
   image_path = "TP3\moodle\data\jpeg\i000.jpeg"
-  video_path = "TP3\moodle\data\mp4\\v003.mp4"
   Vd = Video()
   writer = DataWriter()
-  Vd.extract_video_keyframes(1,video_path,writer)
+  for i in range(1,101):
+    video_path = "TP3\moodle\data\mp4\\v" + str(i).zfill(3) + ( ".mp4")
+    video = cv2.VideoCapture(video_path)
+    fps = video.get(cv2.CAP_PROP_FPS)
+    frames = video.get(cv2.CAP_PROP_FRAME_COUNT)
+    desiredFrames = int(max(1,frames//(3*fps))) 
+    print("TP3\moodle\data\mp4\\v" + str(i).zfill(3) + ( ".mp4"))
+    print(desiredFrames)
+    Vd.extract_video_keyframes(desiredFrames,video_path,writer)
