@@ -4,7 +4,7 @@
 	b) 423MO (4 * 10^8 O)
 
 	c) L*H (image) * f(image/s) * d(durée en s) * c(information en octet par pixel) * n(nbr image)
-	en log base 10: L*H= 5.96(720X1280) f= 1.45(en moyenne en peu moins de 30 images/s)  c= 0.48(3 canaux pour couleur) d= 1.18(moyenne env. 15s) n= 2 (100 images) => environ 10^11 
+	en log base 10: L*H= 5.96(720X1280) f= 1.45(en moyenne en peu moins de 30 images/s) d= 1.18(moyenne env. 15s) c= 0.48(3 canaux pour couleur)  n= 2 (100 videos) => environ 10^11 
 
 	d) tx compression jpeg ????
 
@@ -14,66 +14,18 @@
 
 2.
 	Encodage image:
-		- Tout			(statique serait "équivalent" pour 1/10 des calculs facilement)
-		- Sélection Statique	(x/sec)			(par ex les trames i)
-		- Sélection Dynamique	(plus de calculs)	(existe module le faisant)
+		- Sélection Statique	(x/sec)			1/sec ; 3/sec
 	Paramêtres histogrammes:
 		- Espace de couleur:
-			- RGB
-			- YUV	(X) (plus de calculs --int)
+			- RGB																		X
+			- YUV	(X) (plus de calculs --int)				X
 		- Dimension:
-			- 1D	(256/intervals * 3 de longueur)		
-			- 3D	(256/intervals ^ 3)			
-		- Intervalles
-			- 1	trop de calculs
-			- 2	assez?
-			- 4	acceptable?
-			- 8	acceptable?
-			- 16	trop grand
+			- 3D	(256/intervals ^ 3)					intervals 64 double (1 pour 0-interval, 1 pour interval/2 a 1+ interval/2)
 
 	Mesure:
-		- Distance euclidienne		racine carrée
-		- Distance de Bhattacharyya	-ln(SOMME(sqrt(p*q)))
-		- Produit scalaire
-		- Similarité cosinus 		(produit scalaire / norme) (strictement plus de calculs, mais max donne résultat)
-				cos() = X * Y / (||X|| x ||Y||) => ||X||cos() = X * Y / ||Y|| serais équivalent pour comparaison , on divise par ||X|| selement pour le seuil
+		- Distance Manhattan		se fait simplement par operation numpy (add, abs)
+		- Similarité cosinus 		se fait simplement par operation numpy (norm, mult)
 
-
-Algo:
-//
-CalculNbrKf(video)
-CalculHisto(image)
-Calcul
-//
-1. Histogrammes des vidéos (HV[])
-	1.1 Extraction KF (module katna, détermination de la quatité par vidéo à faire)
-	1.2 Génération histogramme
-//
-for file in Videos
-	nbrKF = CalculNbrKf()
-	kf[] = katna.extractKF()
-	histo[] = []
-	for kf in kf[]
-		histo.append(CalculHisto(kf))
-	IndexResults.append((file, histo[]))
-//
-2. Image
-	2.1 Histogramme d'une image
-	2.2 Comparaison avec videos
-//
-for image in images:
-	hi = CalculHisto(image)
-	result = [0,None]	
-	for video in IndexResult
-		max = 0	
-		for hv in video[1]
-			max = math.max(max, CalculSimCos(hi,hv))
-		if max > result[0]
-			result = [max, video[0]]
-	out = None
-	if result[0] > CalculSeuil(hi)
-		out = qqc
-	else
-		out = autreqqc
-	WriteResultToFile(out)
-//
+	taille de la matrice:
+		100 (vidéo) * |1/3| (image /seconde) * 15 (seconde /video) * (4^3 * 2) (bin histogrammes / image) * 4 (octet par bin)
+			en log base 10: 2 + 1.18 + 2.1 + 0.6 = environ 6
