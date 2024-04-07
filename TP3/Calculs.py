@@ -6,6 +6,14 @@ import Katna.writer as kw
 import cv2
 from multiprocessing import Process, Queue
 import csv
+import torch
+import torchvision.transforms as transforms
+import torchvision.models as models
+
+from PIL import Image
+from einops import rearrange
+from IPython.display import display
+import matplotlib.pyplot as plt
 
 def CalcSimCos(base:np.ndarray, ref:np.ndarray):
   local_b = base.flatten()
@@ -89,6 +97,15 @@ def GetBestCorr(liste):
     if liste[i][1] < best[1]:
         best = liste[i]
   return best
+
+model = models.resnet18(weights=models.ResNet18_Weights.DEFAULT)   # le modèle est chargé avec des poids pré-entrainés sur ImageNet
+model = torch.nn.Sequential(*(list(model.children())[:-1]))        # supprime la dernière couche du réseau
+model.eval();   
+
+def encode_image():
+   with torch.no_grad():
+    output = model(input_batch)  # 1 x 512 x 1 x 1 
+
 
 if __name__ == '__main__':
   import time
