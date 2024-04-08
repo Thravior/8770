@@ -20,7 +20,7 @@ def CalcSimCos(base:np.ndarray, ref:np.ndarray):
   local_r = ref.flatten()
   return (np.dot(local_b,local_r)/(norm(local_r)*norm(local_b)))
 
-def CalcDist(base:np.ndarray, ref:np.ndarray):
+def CalcDist(base, ref:np.ndarray):
   local_b = base.flatten()/base.sum()
   local_r = ref.flatten()/ref.sum()
   dist:np.ndarray = np.absolute([local_b - local_r])
@@ -98,13 +98,14 @@ def GetBestCorr(liste):
         best = liste[i]
   return best
 
-model = models.resnet18(weights=models.ResNet18_Weights.DEFAULT)   # le modèle est chargé avec des poids pré-entrainés sur ImageNet
+model = models.resnet18(weights=models.ResNet18_Weights.IMAGENET1K_V1.transforms)   # le modèle est chargé avec des poids pré-entrainés sur ImageNet
 model = torch.nn.Sequential(*(list(model.children())[:-1]))        # supprime la dernière couche du réseau
 model.eval();   
 
-def encode_image():
+def Encode_image(image):
    with torch.no_grad():
-    output = model(input_batch)  # 1 x 512 x 1 x 1 
+    output = model(image)
+    print("output encode", output)  # 1 x 512 x 1 x 1 
 
 
 if __name__ == '__main__':
@@ -133,7 +134,8 @@ if __name__ == '__main__':
       now = time.time()
 
       for target in range(1,101):
-        video_path = "TP3\moodle\data\mp4\\v" + str(target).zfill(3) +  ".mp4"
+        #video_path = "TP3\moodle\data\mp4\\v" + str(target).zfill(3) +  ".mp4"
+        video_path = "TP3/moodle/data/mp4/v001.mp4"
         captures.append(f_extract(video_path,f_color))
 
       temps_indexation = time.time() - now
@@ -141,7 +143,7 @@ if __name__ == '__main__':
       print("Durée indexation:")
       print(temps_indexation)
 
-      csv_file_path = "results_"+desc_temps[f]+"s_Coul"+desc_color[c]+"_hist3d_2pieces_taille64_distManh.csv"
+      csv_file_path = "results_"+desc_temps[f]+"s_ReseauxNeurones.csv"
 
       now = time.time()
       with open(csv_file_path, 'w', newline='') as csvfile:
@@ -149,8 +151,20 @@ if __name__ == '__main__':
         csv_writer.writerow(("image","video_pred","minutage_pred"))
 
         for i in range(0,1000):
-          image_path = "TP3\moodle\data\jpeg\i" + str(i).zfill(3) +".jpeg"
-          histogram = CalculHisto3D(f_color(cv2.imread(image_path)))
+          #image_path = "TP3\moodle\data\jpeg\i" + str(i).zfill(3) +".jpeg"
+          #home/marie-claire/Documents/8770/8770/TP3/moodle/data/jpeg
+          image_path = "TP3/moodle/data/jpeg/i000.jpeg"
+          image = Image.open(image_path)
+          preprocess = transforms.Compose([
+            transforms.Resize((224,224)),
+            transforms.ToTensor(),
+            transforms.Normalize(mean = [0.485, 0.456, 0.406], 
+                                  std=[0.229,0.224,0.225])
+          ])
+          input_tensor = preprocess(image)
+          input_image = input_tensor.unsqueeze(0)
+          histogram = Encode_image(input_image)
+          histogram:np.ndarray
           res = []
           for video in captures:
             rows_b = []
